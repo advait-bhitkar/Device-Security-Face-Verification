@@ -13,7 +13,8 @@
         android:src="@drawable/ic_baseline_sticky_note_2_24"
         app:layout_constraintTop_toTopOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/image" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -21,7 +22,7 @@
         app:layout_constraintTop_toBottomOf="@+id/logo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="Secret Note App"
+        android:text="@string/secret_note_app"
         android:textSize="24sp"
         android:layout_marginTop="8dp" />
 
@@ -33,7 +34,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
-        android:text="Sign in/ Sign up"
+        android:text="@string/sign_in_sign_up"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -35,12 +35,20 @@
             android:layout_height="match_parent"
             app:scaleType="fillCenter" />
 
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:contentDescription="@string/image" />
+
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/hollow_circle"
-            android:scaleType="fitXY"/>
+            android:scaleType="fitXY"
+            android:contentDescription="@string/image" />
 
     </FrameLayout>
 
@@ -51,7 +59,7 @@
         android:id="@+id/text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Place your face in the center and capture the photo."
+        android:text="@string/text1"
         android:textSize="20sp"
         android:gravity="center_horizontal"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +75,7 @@
         android:id="@+id/upload_image"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:text="Upload your photo"
+        android:text="@string/upload_your_photo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

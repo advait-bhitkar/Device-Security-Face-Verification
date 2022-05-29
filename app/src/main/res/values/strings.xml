@@ -10,4 +10,12 @@
     <string name="azure_location">centralindia</string>
     <string name="person_group_id">device_security_person_group</string>
     <string name="cognito_id">ap-south-1:7e09adee-565c-41c6-a44c-92a67068ff28</string>
+    <string name="image">image</string>
+    <string name="text1">Place your face in the center and capture the photo.</string>
+    <string name="upload_your_photo">Upload your photo</string>
+    <string name="save">Save</string>
+    <string name="add_face_security">Add Face Security</string>
+    <string name="enter_your_message">Enter your secret message here...</string>
+    <string name="secret_note_app">Secret Note App</string>
+    <string name="sign_in_sign_up">Sign in/ Sign up</string>
 </resources>

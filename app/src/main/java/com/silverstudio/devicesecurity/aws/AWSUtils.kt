@@ -1,9 +1,9 @@
 package com.silverstudio.devicesecurity.aws
 
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.text.TextUtils
-import androidx.camera.core.ImageCapture
-import com.amazonaws.HttpMethod
+import android.util.Log
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
@@ -11,23 +11,26 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.regions.Region
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest
-import com.amazonaws.services.s3.model.ResponseHeaderOverrides
-import com.silverstudio.devicesecurity.fragment.VerifyFaceFragment
 import java.io.File
-import java.text.DateFormat
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.*
+
+/**
+ * Aws S3 image uploader class
+ */
 
 class AWSUtils(private val context: Context, private val filePath: String, val onAwsImageUploadListener: OnAwsImageUploadListener, val filePathKey: String) {
 
+
+    /**
+     * Declare variables
+     */
     private var image: File? = null
     private var mTransferUtility: TransferUtility? = null
-
     private var sS3Client: AmazonS3Client? = null
     private var sCredProvider: CognitoCachingCredentialsProvider? = null
 
+    /**
+     * Get aws cognito credential ID
+     */
     private fun getCredProvider(context: Context): CognitoCachingCredentialsProvider? {
         if (sCredProvider == null) {
             sCredProvider = CognitoCachingCredentialsProvider(context.applicationContext, AwsConstants.COGNITO_IDENTITY_ID, AwsConstants.COGNITO_REGION)
@@ -35,6 +38,9 @@ class AWSUtils(private val context: Context, private val filePath: String, val o
         return sCredProvider
     }
 
+    /**
+     * Get an instance of AWS S3 Client
+     */
     private fun getS3Client(context: Context?): AmazonS3Client? {
         if (sS3Client == null) {
             sS3Client = AmazonS3Client(getCredProvider(context!!))
@@ -43,6 +49,10 @@ class AWSUtils(private val context: Context, private val filePath: String, val o
         return sS3Client
     }
 
+    /**
+     * Get an instance of Transfer utility
+     * this is used to upload files to AWS
+     */
     private fun getTransferUtility(context: Context): TransferUtility? {
         if (mTransferUtility == null) {
             mTransferUtility = TransferUtility(
@@ -53,6 +63,11 @@ class AWSUtils(private val context: Context, private val filePath: String, val o
         return mTransferUtility
     }
 
+    /**
+     * Begin Image upload to S3 bucket
+     * It requires locally stored image path and
+     * AWS bucket url path
+     */
     fun beginUpload() {
 
         if (TextUtils.isEmpty(filePath)) {
@@ -76,45 +91,9 @@ class AWSUtils(private val context: Context, private val filePath: String, val o
         }
     }
 
-    private fun generateS3SignedUrl(path: String?): String? {
-
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, 1)
-        val tomorrow = calendar.time
-
-        val dateFormat: DateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
-        val tomorrowAsString = dateFormat.format(tomorrow)
-
-        val EXPIRY_DATE = tomorrowAsString // maximum 7 days allowed
-        val mFile = File(path)
-
-        val s3client: AmazonS3Client? = getS3Client(context)
-
-        val expiration = Date()
-        var msec: Long = expiration.time
-        msec += 1000 * 6000 * 6000.toLong() // 1 hour.
-
-        val format: DateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
-        val date: Date?
-        try {
-            date = format.parse(EXPIRY_DATE)
-            expiration.time = date.time
-        } catch (e: ParseException) {
-            e.printStackTrace()
-            expiration.time = msec
-        }
-
-        val overrideHeader = ResponseHeaderOverrides()
-        overrideHeader.contentType = "image/jpeg"
-        val mediaUrl: String = mFile.name
-
-        val generatePreSignedUrlRequest = GeneratePresignedUrlRequest(AwsConstants.BUCKET_NAME, filePathKey + mediaUrl)
-        generatePreSignedUrlRequest.method = HttpMethod.GET
-        generatePreSignedUrlRequest.expiration = expiration
-        generatePreSignedUrlRequest.responseHeaders = overrideHeader
-
-        return s3client!!.generatePresignedUrl(generatePreSignedUrlRequest).toString()
-    }
+    /**
+     * Implement upload Listener
+     */
 
     private inner class UploadListener : TransferListener {
 
@@ -130,12 +109,13 @@ class AWSUtils(private val context: Context, private val filePath: String, val o
             if (newState == TransferState.COMPLETED) {
 
                 onAwsImageUploadListener.hideProgressDialog()
-
                 val finalImageUrl = AwsConstants.S3_URL + filePathKey + image!!.name
-//                onAwsImageUploadListener.onSuccess(generateS3SignedUrl(finalImageUrl)!!)
                 onAwsImageUploadListener.onSuccess(finalImageUrl)
-
-//                image!!.delete()
+                /**
+                 * Delete Image from local storage after uploading
+                 * to s3 storage
+                 */
+                deleteImage(image!!.absolutePath)
 
 
             } else if (newState == TransferState.CANCELED || newState == TransferState.FAILED) {
@@ -143,6 +123,24 @@ class AWSUtils(private val context: Context, private val filePath: String, val o
                 onAwsImageUploadListener.onError("Error in uploading file.")
             }
         }
+    }
+
+
+    /**
+     * Delete local image
+     * Takes file path as parameter
+     */
+    private fun deleteImage( filePath: String){
+
+        val fDelete = File(filePath)
+        if (fDelete.exists()) {
+            if (fDelete.delete()) {
+                Log.d(TAG,"file Deleted :")
+            } else {
+                Log.d(TAG,"file not Deleted :")
+            }
+        }
+
     }
 
     interface OnAwsImageUploadListener {

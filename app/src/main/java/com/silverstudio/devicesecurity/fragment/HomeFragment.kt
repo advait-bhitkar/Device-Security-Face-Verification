@@ -18,9 +18,16 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.silverstudio.devicesecurity.R
 
-
+/**
+ * This the home fragment
+ * It is the main fragment where user can add or
+ * edit the note
+ */
 class HomeFragment : Fragment() {
 
+    /*
+    Declare variables
+     */
     private lateinit var textMessage: TextInputEditText
     private lateinit var buttonSaveMessage: MaterialButton
     private lateinit var buttonAddFaceSecurity: MaterialButton
@@ -31,19 +38,29 @@ class HomeFragment : Fragment() {
 
         auth = FirebaseAuth.getInstance()
         val sharedPref = requireActivity().getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
-//        sharedPref.edit().putBoolean("isFaceSecurityAdded",true).apply()
         val isFaceSecurityAdded = sharedPref.getBoolean("isFaceSecurityAdded", false)
         val isFaceVerified = sharedPref.getBoolean("isFaceVerified", false)
+
+        /**
+         * Check is user is logged in
+         * If not logged in redirect the use to LoginFragment
+         */
         if (auth.currentUser == null)
         {
             findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
 
-        }else if (isFaceSecurityAdded && !isFaceVerified)
+        }
+        /**
+         * Check if face security feature is enabled
+         * If enabled check is face is identified for the session
+         * by checking 'isFaceVerified' variable
+         * If face is not verified redirect user to VerifyFaceFragment
+         */
+        else if (isFaceSecurityAdded && !isFaceVerified)
         {
             findNavController().navigate(R.id.action_homeFragment_to_verifyFaceFragment)
         }
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
@@ -57,11 +74,17 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        /**
+         * Initialize the views
+         */
         toolbar = view.findViewById(R.id.toolbar)
         textMessage = view.findViewById(R.id.message_text)
         buttonSaveMessage = view.findViewById(R.id.save_message_button)
         buttonAddFaceSecurity = view.findViewById(R.id.face_security_button)
 
+        /**
+         * Set logout feature to toolbar options menu
+         */
         toolbar.setOnMenuItemClickListener {
             when(it.itemId) {
                 R.id.logout -> {
@@ -73,25 +96,32 @@ class HomeFragment : Fragment() {
         }
 
         val sharedPref = requireActivity().getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
-
         if (sharedPref.getString("message", "").toString().isNotEmpty())
             textMessage.setText(sharedPref.getString("message", ""))
 
-
+        /**
+         * Set the text of button accordingly,
+         */
         if (sharedPref.getBoolean("isFaceSecurityAdded", false))
             buttonAddFaceSecurity.text = "Remove Face Security"
         else
             buttonAddFaceSecurity.text = "Add Face security"
 
 
+        /**
+         * Save the secret note to the shared preference
+         * toobar.hasFocus() is used to remove the focus from the editText
+         */
         buttonSaveMessage.setOnClickListener {
-
             sharedPref.edit().putString("message",textMessage.text.toString()).apply()
             toolbar.hasFocus()
+            /**
+             * Collapse keyboard
+             */
             try {
                 val imm: InputMethodManager? =
                     requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager?
-                imm!!.hideSoftInputFromWindow(requireActivity().currentFocus!!.getWindowToken(), 0)
+                imm!!.hideSoftInputFromWindow(requireActivity().currentFocus!!.windowToken, 0)
             } catch (e: Exception) {
                 Log.d("error", e.toString())
             }
@@ -105,15 +135,10 @@ class HomeFragment : Fragment() {
             {
                 buttonAddFaceSecurity.text = "Add Face security"
                 sharedPref.edit().putBoolean("isFaceSecurityAdded",false).apply()
-
-
             }else
             {
                 findNavController().navigate(R.id.action_homeFragment_to_addFaceSecurityFragment)
                 buttonAddFaceSecurity.text = "Remove Face Security "
-
-
-
             }
         }
     }
