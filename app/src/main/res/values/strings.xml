@@ -9,4 +9,5 @@
     <string name="azure_key">02f65c6671dd447ca6de32e3f5be9e40</string>
     <string name="azure_location">centralindia</string>
     <string name="person_group_id">device_security_person_group</string>
+    <string name="cognito_id">ap-south-1:7e09adee-565c-41c6-a44c-92a67068ff28</string>
 </resources>
