@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Secret Note</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="azure_api_endpoint">https://face-recognition-smart-advertising.cognitiveservices.azure.com/</string>
+    <string name="azure_key">02f65c6671dd447ca6de32e3f5be9e40</string>
+    <string name="azure_location">centralindia</string>
+    <string name="person_group_id">device_security_person_group</string>
+</resources>
